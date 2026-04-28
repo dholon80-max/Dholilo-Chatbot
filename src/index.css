@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-indigo-50: #f5f7ff;
+  --color-indigo-100: #ebf0ff;
+  --color-indigo-200: #d6e0ff;
+  --color-indigo-300: #adc2ff;
+  --color-indigo-400: #84a3ff;
+  --color-indigo-500: #5c85ff;
+  --color-indigo-600: #3366ff;
+  --color-indigo-700: #2952cc;
+  --color-indigo-800: #1f3d99;
+  --color-indigo-900: #142966;
+}
+
+@layer base {
+  html {
+    @apply transition-colors duration-300;
+  }
+  
+  body {
+    @apply bg-white text-slate-900 antialiased transition-colors duration-300;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Prose overrides for chat bubbles */
+.prose {
+  @apply text-inherit;
+}
+.prose p {
+  @apply my-1 leading-relaxed;
+}
+.prose pre {
+  @apply bg-slate-800 text-slate-100 p-4 rounded-xl my-2 overflow-x-auto text-[13px] font-mono border border-slate-700;
+}
+.prose code {
+  @apply bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[13px] border border-slate-200;
+}
+
+.dark .prose pre {
+  @apply bg-slate-900 border-slate-700;
+}
+
+.dark .prose code {
+  @apply bg-slate-800 text-slate-200 border-slate-700;
+}
+
