@@ -21,24 +21,29 @@ async function startServer() {
     try {
       const { contents, config } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
+
       if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-        console.error("GEMINI_API_KEY is missing or invalid placeholder used.");
-        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server. Please add it to Render's Environment Variables." });
+        const errorMsg = "GEMINI_API_KEY is missing or using placeholder ('MY_GEMINI_API_KEY'). Please set the GEMINI_API_KEY environment variable in your Render dashboard.";
+        console.error(errorMsg);
+        return res.status(500).json({ error: errorMsg });
       }
 
-      console.log("Using API Key (first 4 chars):", apiKey.substring(0, 4) + "...");
+      // Log first few chars for debugging (safe)
+      console.log(`Initialising Gemini API with key: ${apiKey.substring(0, 4)}...`);
 
-      const ai = new GoogleGenAI(apiKey);
-      const model = ai.getGenerativeModel({ 
+      const genAI = new GoogleGenAI(apiKey);
+      const model = genAI.getGenerativeModel({ 
         model: "gemini-1.5-flash",
         systemInstruction: config?.systemInstruction,
       });
 
+      console.log("Sending request to Gemini model: gemini-1.5-flash");
+
       const result = await model.generateContentStream({
         contents,
         generationConfig: {
-          temperature: config?.temperature,
-          topP: config?.topP,
+          temperature: config?.temperature || 0.7,
+          topP: config?.topP || 0.95,
         }
       });
 
