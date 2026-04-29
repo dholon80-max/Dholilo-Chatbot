@@ -149,7 +149,7 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
       <header className="bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 px-4 py-1.5 flex items-center justify-between sticky top-0 z-10 transition-colors">
         <div className="flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
-            <img src={avatarUrl} alt="Dholilo" className="w-full h-full object-cover" />
+            <img src={avatarUrl} alt="Dholilo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           <div>
             <h1 className="font-bold text-slate-900 dark:text-white leading-none text-base">Dholilo Chatbot</h1>
