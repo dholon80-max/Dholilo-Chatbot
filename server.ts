@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -28,10 +28,10 @@ async function startServer() {
         return res.status(500).json({ error: errorMsg });
       }
 
-      // Log first few chars for debugging (safe)
+      // Safe log for debugging
       console.log(`Initialising Gemini API with key: ${apiKey.substring(0, 4)}...`);
 
-      const genAI = new GoogleGenAI(apiKey);
+      const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
         model: "gemini-1.5-flash",
         systemInstruction: config?.systemInstruction,
@@ -44,6 +44,7 @@ async function startServer() {
         generationConfig: {
           temperature: config?.temperature || 0.7,
           topP: config?.topP || 0.95,
+          maxOutputTokens: 2048,
         }
       });
 
