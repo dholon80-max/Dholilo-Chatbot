@@ -125,11 +125,12 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
           ));
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Chat Handle Error:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: Role.MODEL,
-        content: "I am sorry Friend, I faced an error. How can I help you resolve this, Sir?",
+        content: `I am sorry Sir, I faced an error: ${error.message || "Unknown error"}. Please check your GEMINI_API_KEY.`,
         timestamp: Date.now(),
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -145,21 +146,24 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
     )}>
       {/* Header */}
       <header className="bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 px-4 py-1.5 flex items-center justify-between sticky top-0 z-10 transition-colors">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center border border-slate-200 dark:border-slate-800 overflow-hidden shadow-md">
             {avatarUrl ? (
               <img 
                 src={avatarUrl} 
                 alt="Dholilo" 
                 className="w-full h-full object-cover" 
-                referrerPolicy="no-referrer"
               />
             ) : (
               <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white font-bold">D</div>
             )}
           </div>
           <div>
-            <h1 className="font-bold text-slate-900 dark:text-white leading-none text-base">Dholilo Chatbot</h1>
+            <h1 className="font-bold text-slate-900 dark:text-white leading-tight text-lg">Dholilo Chatbot</h1>
+            <p className="text-[10px] text-green-500 font-medium flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              Online
+            </p>
           </div>
         </div>
 

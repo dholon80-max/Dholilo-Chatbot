@@ -31,6 +31,7 @@ export const sendMessageStream = async (history: Message[], userInput: string) =
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.error("Gemini Service Fetch Error:", errorData);
     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
   }
 

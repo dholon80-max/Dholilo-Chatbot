@@ -16,6 +16,16 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    console.log("Health check requested");
+    res.json({ 
+      status: "ok", 
+      env: process.env.NODE_ENV,
+      hasApiKey: !!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "MY_GEMINI_API_KEY"
+    });
+  });
+
   // API Proxy for Gemini to keep key secret and avoid CORS
   app.post("/api/chat", async (req, res) => {
     try {
@@ -23,21 +33,21 @@ async function startServer() {
       const apiKey = process.env.GEMINI_API_KEY;
 
       if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-        const errorMsg = "GEMINI_API_KEY is missing or using placeholder ('MY_GEMINI_API_KEY'). Please set the GEMINI_API_KEY environment variable in your Render dashboard.";
-        console.error(errorMsg);
+        const errorMsg = "GEMINI_API_KEY is missing or using placeholder ('MY_GEMINI_API_KEY'). Please set your GEMINI_API_KEY in Render Environment Variables.";
+        console.error("Dholilo Error:", errorMsg);
         return res.status(500).json({ error: errorMsg });
       }
 
       // Safe log for debugging
-      console.log(`Initialising Gemini API with key: ${apiKey.substring(0, 4)}...`);
+      console.log(`Initialising Gemini API with key: ${apiKey.substring(0, 4)}... (length: ${apiKey.length})`);
 
-      const genAI = new GoogleGenerativeAI(apiKey);
+      const genAI = new GoogleGenerativeAI(apiKey.trim());
       const model = genAI.getGenerativeModel({ 
         model: "gemini-1.5-flash",
         systemInstruction: config?.systemInstruction,
       });
 
-      console.log("Sending request to Gemini model: gemini-1.5-flash");
+      console.log("Requesting Gemini stream...");
 
       const result = await model.generateContentStream({
         contents,
@@ -58,9 +68,13 @@ async function startServer() {
         }
       }
       res.end();
+      console.log("Stream finished successfully.");
     } catch (error: any) {
       console.error("Server API Error:", error);
-      res.status(500).json({ error: error.message || "Internal Server Error" });
+      res.status(500).json({ 
+        error: error.message || "Internal Server Error",
+        details: error.stack
+      });
     }
   });
 

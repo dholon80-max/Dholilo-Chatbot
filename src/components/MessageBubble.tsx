@@ -22,13 +22,16 @@ export const MessageBubble = ({ message, avatarUrl }: MessageProps) => {
       )}
     >
       {isBot && (
-        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800 shadow-sm">
-          <img 
-            src={avatarUrl} 
-            alt="Dholilo Avatar" 
-            className="w-full h-full object-cover" 
-            referrerPolicy="no-referrer"
-          />
+        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-center bg-white">
+          {avatarUrl ? (
+            <img 
+              src={avatarUrl} 
+              alt="Dholilo Avatar" 
+              className="w-full h-full object-cover" 
+            />
+          ) : (
+            <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold">D</div>
+          )}
         </div>
       )}
       <div className={cn(
