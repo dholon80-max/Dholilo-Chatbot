@@ -31,7 +31,7 @@ export const MessageBubble = ({ message, avatarUrl }: MessageProps) => {
             ? "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none" 
             : "bg-slate-900 dark:bg-white border-slate-800 dark:border-slate-200 text-white dark:text-slate-900 rounded-tr-none"
         )}>
-          <div className="prose prose-sm max-w-none dark:prose-invert">
+          <div className="prose prose-lg max-w-none dark:prose-invert">
             <ReactMarkdown>
               {message.content}
             </ReactMarkdown>

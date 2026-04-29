@@ -148,11 +148,11 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
       {/* Header */}
       <header className="bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 px-4 py-1.5 flex items-center justify-between sticky top-0 z-10 transition-colors">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
             <img src={avatarUrl} alt="Dholilo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           <div>
-            <h1 className="font-bold text-slate-900 dark:text-white leading-none text-sm">Dholilo Chatbot</h1>
+            <h1 className="font-bold text-slate-900 dark:text-white leading-none text-base">Dholilo Chatbot</h1>
           </div>
         </div>
 
@@ -207,7 +207,7 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
               }}
               placeholder="Type your message..."
               rows={1}
-              className="flex-1 bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-100 min-h-[40px] py-2 px-0 resize-none text-base placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+              className="flex-1 bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-100 min-h-[44px] py-2 px-0 resize-none text-lg placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
             />
           </div>
           <button
