@@ -21,17 +21,22 @@ async function startServer() {
     try {
       const { contents, config } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
-
-      if (!apiKey) {
-        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
+      if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
+        console.error("GEMINI_API_KEY is missing or invalid placeholder used.");
+        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server. Please add it to Render's Environment Variables." });
       }
 
-      const ai = new GoogleGenAI({ apiKey });
-      const result = await ai.models.generateContentStream({
-        model: "gemini-3-flash-preview",
+      console.log("Using API Key (first 4 chars):", apiKey.substring(0, 4) + "...");
+
+      const ai = new GoogleGenAI(apiKey);
+      const model = ai.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        systemInstruction: config?.systemInstruction,
+      });
+
+      const result = await model.generateContentStream({
         contents,
-        config: {
-          systemInstruction: config?.systemInstruction,
+        generationConfig: {
           temperature: config?.temperature,
           topP: config?.topP,
         }
@@ -40,8 +45,8 @@ async function startServer() {
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
       res.setHeader('Transfer-Encoding', 'chunked');
 
-      for await (const chunk of result) {
-        const text = chunk.text;
+      for await (const chunk of result.stream) {
+        const text = chunk.text();
         if (text) {
           res.write(text);
         }
