@@ -43,9 +43,27 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [quotaCountdown, setQuotaCountdown] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const welcomeText = "Hello! I am Dholilo your assistant.\n\nHow can I help you today?";
+
+  // Quota Countdown Logic
+  useEffect(() => {
+    if (quotaCountdown > 0) {
+      const timer = setTimeout(() => setQuotaCountdown(quotaCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [quotaCountdown]);
+
+  const clearChat = () => {
+    setMessages([{
+      id: "welcome",
+      role: Role.MODEL,
+      content: welcomeText,
+      timestamp: Date.now(),
+    }]);
+  };
 
   useEffect(() => {
     let currentText = "";
@@ -127,12 +145,45 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
       }
     } catch (error: any) {
       console.error("Chat Handle Error:", error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: Role.MODEL,
-        content: `I am sorry Sir, I faced an error: ${error.message || "Unknown error"}. Please check your GEMINI_API_KEY.`,
-        timestamp: Date.now(),
-      };
+      
+      let displayError = "Unknown error";
+      let isQuota = false;
+      let isRegion = false;
+      
+      try {
+        const parsed = JSON.parse(error.message);
+        if (parsed.error) {
+          displayError = parsed.error;
+          if (parsed.error.includes("Minute") || parsed.error.includes("429")) {
+            isQuota = true;
+            setQuotaCountdown(60);
+          }
+          if (parsed.error.includes("Region") || parsed.error.includes("Restriction")) {
+            isRegion = true;
+          }
+          if (parsed.suggestion) {
+            displayError += `\n\n---\n\n### 🛡️ HOW TO FIX THIS:\n${parsed.suggestion}`;
+          }
+        }
+      } catch (e) {
+        displayError = error.message || "Unknown Connection Error";
+        if (displayError.toLowerCase().includes("location") || displayError.toLowerCase().includes("unsupported") || displayError.toLowerCase().includes("restricted")) {
+          isRegion = true;
+        }
+      }
+
+          const healthUrl = "/api/health";
+
+          const errorMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: Role.MODEL,
+            content: isQuota 
+              ? `### ⏳ SPEED LIMIT REACHED\nSir, you used the free key too fast. **Please wait 1 minute.**\n\nYour key is **WORKING**, but Google is slowing us down. The countdown is starting at the bottom.`
+              : isRegion 
+              ? `### 🌏 REGION BLOCKED (PERMANENT)\nSir, this is **NOT** a timed block. Google is detecting your location.\n\n**HOW TO FIX:**\n1. Ensure **VPN (USA)** is ON.\n2. Open a **Guest Profile** in your browser.\n3. Create a **New Google Account** while on VPN.\n\n*Check the [System Check](${healthUrl}) for details.*`
+              : `I am sorry Sir, I faced an error: **${displayError}**\n\n---\n### 🛡️ SYSTEM ADVICE:\n1. **[Get a New Key here](https://aistudio.google.com/app/apikey)** if yours is deleted or expired.\n2. Always verify with **[System Check](${healthUrl})**.\n3. Keep your **VPN set to USA**.`,
+            timestamp: Date.now(),
+          };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -147,7 +198,7 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
       {/* Header */}
       <header className="bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 px-4 py-1.5 flex items-center justify-between sticky top-0 z-10 transition-colors">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center border border-slate-200 dark:border-slate-800 overflow-hidden shadow-md">
+            <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 relative group">
             {avatarUrl ? (
               <img 
                 src={avatarUrl} 
@@ -166,20 +217,21 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
             </p>
           </div>
         </div>
-
-        <button
-          onClick={toggleTheme}
-          className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95"
-          aria-label="Toggle Theme"
-        >
-          {theme === "light" ? <Moon size={14} /> : <Sun size={14} />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95"
+            aria-label="Toggle Theme"
+          >
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
+        </div>
       </header>
 
       {/* Messages Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-8 space-y-6 no-scrollbar bg-transparent"
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-4 no-scrollbar bg-transparent"
       >
         <AnimatePresence mode="popLayout">
           {messages.map((msg) => (
@@ -191,8 +243,8 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
               animate={{ opacity: 1 }}
               className="flex items-start"
             >
-              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-5 py-3 rounded-2xl rounded-tl-none flex items-center justify-center h-10 shadow-sm">
-                <div className="flex gap-1.5">
+              <div className="bg-slate-100 dark:bg-slate-900 px-4 py-2 rounded-2xl rounded-tl-none flex items-center justify-center h-8">
+                <div className="flex gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 animate-bounce" />
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 animate-bounce [animation-delay:0.2s]" />
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 animate-bounce [animation-delay:0.4s]" />
@@ -205,6 +257,21 @@ export const ChatInterface = ({ avatarUrl }: ChatInterfaceProps) => {
 
       {/* Input Area */}
       <div className="p-2 pb-3 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 transition-colors">
+        {quotaCountdown > 0 && (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="max-w-4xl mx-auto mb-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl text-amber-700 dark:text-amber-400 text-sm font-medium flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <span className="animate-spin text-lg">⏳</span>
+              Sir, please wait for Gemini to cool down.
+            </div>
+            <div className="bg-amber-200 dark:bg-amber-900 px-3 py-1 rounded-full font-bold">
+              {quotaCountdown}s
+            </div>
+          </motion.div>
+        )}
         <div className="max-w-4xl mx-auto flex items-center gap-2">
           <div className="flex-1 bg-slate-50 dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800 focus-within:border-blue-400 dark:focus-within:border-blue-600 focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:ring-4 focus-within:ring-blue-400/10 transition-all flex items-center px-4 overflow-hidden">
             <textarea

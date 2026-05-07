@@ -1,20 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Dholilo Chatbot
 
-# Run and deploy your AI Studio app
+A highly intelligent, polite, and professional AI Assistant built with React, Vite, and Express, powered by Google's Gemini models.
 
-This contains everything you need to run your app locally.
+## 🚀 Features
 
-View your app in AI Studio: https://ai.studio/apps/6eb49ccd-4558-4465-86bf-54c13285cba9
+- **Multi-Model Support**: Automatically cycles through Gemini 2.0 Flash, 1.5 Flash, and Pro to find the best working model.
+- **Smart Quota Handling**: Detects and explains "Speed Limits" (429 errors) gracefully.
+- **Region-Aware Diagnostics**: Includes a built-in `/api/health` system to help bypass region restrictions.
+- **Polite Personality**: Designed to treat the user with the utmost respect.
+- **Dark/Light Mode**: Full responsive UI with smooth transitions.
 
-## Run Locally
+## 🛠️ Setup
 
-**Prerequisites:**  Node.js
+1. Clone the repository.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set your API Key in your environment or a `.env` file:
+   ```env
+   GEMINI_API_KEY_1=your_api_key_here
+   ```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
+## 📦 Deployment (Render / Cloud Run)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+This app is production-ready. Ensure you set the `PORT` and `GEMINI_API_KEY_1` environment variables in your deployment settings.
+
+## 📄 License
+
+MIT

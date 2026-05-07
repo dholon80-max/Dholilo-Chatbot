@@ -17,23 +17,10 @@ export const MessageBubble = ({ message, avatarUrl }: MessageProps) => {
       initial={{ opacity: 0, y: 10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       className={cn(
-        "flex w-full mb-6 gap-3",
+        "flex w-full mb-6",
         isBot ? "flex-row" : "flex-row-reverse"
       )}
     >
-      {isBot && (
-        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-center bg-white">
-          {avatarUrl ? (
-            <img 
-              src={avatarUrl} 
-              alt="Dholilo Avatar" 
-              className="w-full h-full object-cover" 
-            />
-          ) : (
-            <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold">D</div>
-          )}
-        </div>
-      )}
       <div className={cn(
         "flex flex-col max-w-[85%]",
         isBot ? "items-start" : "items-end"

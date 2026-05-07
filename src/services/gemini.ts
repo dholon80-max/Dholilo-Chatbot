@@ -32,7 +32,7 @@ export const sendMessageStream = async (history: Message[], userInput: string) =
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     console.error("Gemini Service Fetch Error:", errorData);
-    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    throw new Error(JSON.stringify(errorData));
   }
 
   const reader = response.body?.getReader();
@@ -44,7 +44,7 @@ export const sendMessageStream = async (history: Message[], userInput: string) =
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const text = decoder.decode(value);
+        const text = decoder.decode(value, { stream: true });
         yield { text };
       }
     }
