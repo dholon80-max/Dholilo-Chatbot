@@ -786,7 +786,7 @@ async function startServer() {
     }
   });
 
-  // Vite middleware for development
+  // Static files and SPA fallback
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -795,6 +795,17 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    
+    // Explicitly serve manifest and sw with correct types
+    app.get('/manifest.json', (req, res) => {
+      res.header('Content-Type', 'application/manifest+json');
+      res.sendFile(path.join(distPath, 'manifest.json'));
+    });
+    app.get('/sw.js', (req, res) => {
+      res.header('Content-Type', 'application/javascript');
+      res.sendFile(path.join(distPath, 'sw.js'));
+    });
+
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
